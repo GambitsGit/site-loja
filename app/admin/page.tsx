@@ -8,6 +8,8 @@ import ProductForm from './ProductForm'
 import LogoutButton from './LogoutButton'
 import ProductActions from './ProductActions'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
   const supabase = await createClient()
 

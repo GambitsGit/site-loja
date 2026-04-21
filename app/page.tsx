@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import type { Produto } from '@/types'
 import ProductCarousel from './components/ProductCarousel'
 
+export const dynamic = 'force-dynamic'
+
 const WHATSAPP_NUMBER = '5541992533439'
 
 function getWhatsAppLink(titulo: string, preco: number): string {
