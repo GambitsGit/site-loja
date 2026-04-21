@@ -137,6 +137,7 @@ export default async function AdminPage() {
                           descricao={produto.descricao ?? null}
                           preco={produto.preco}
                           ativo={produto.ativo}
+                          imagens={produto.produto_imagens ?? []}
                         />
                       </div>
                     </li>

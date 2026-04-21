@@ -178,73 +178,142 @@ export default function ProductActions({ id, titulo, descricao, preco, ativo, im
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
           onClick={(e) => { if (e.target === e.currentTarget) setEditOpen(false) }}
         >
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-gray-800">Editar Produto</h3>
               <button onClick={() => setEditOpen(false)} className="text-gray-300 hover:text-gray-500">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Título <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editTitulo}
-                  onChange={(e) => setEditTitulo(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Descrição</label>
-                <textarea
-                  value={editDescricao}
-                  onChange={(e) => setEditDescricao(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Preço (R$) <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editPreco}
-                  onChange={(e) => setEditPreco(e.target.value)}
-                  placeholder="29,90"
-                  className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
-                />
-              </div>
-
-              {editError && (
-                <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-xl">{editError}</p>
-              )}
-            </div>
-
-            <div className="flex gap-3 mt-6">
+            {/* Abas */}
+            <div className="flex gap-1 bg-rose-50 rounded-xl p-1 mb-5">
               <button
-                onClick={() => setEditOpen(false)}
-                className="flex-1 py-2.5 rounded-2xl border border-rose-100 text-sm text-gray-500 hover:bg-rose-50 transition-colors"
+                onClick={() => setTab('dados')}
+                className={`flex-1 text-sm font-semibold py-1.5 rounded-lg transition-colors ${tab === 'dados' ? 'bg-white text-rose-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
               >
-                Cancelar
+                Dados
               </button>
               <button
-                onClick={handleSave}
-                disabled={loadingSave || !editTitulo.trim()}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-rose-400 hover:bg-rose-500 text-white text-sm font-bold transition-colors disabled:opacity-60"
+                onClick={() => setTab('fotos')}
+                className={`flex-1 text-sm font-semibold py-1.5 rounded-lg transition-colors ${tab === 'fotos' ? 'bg-white text-rose-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
               >
-                <Save size={15} />
-                {loadingSave ? 'Salvando...' : 'Salvar'}
+                Fotos ({localImagens.length}/6)
               </button>
             </div>
+
+            {/* Aba Dados */}
+            {tab === 'dados' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Título <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editTitulo}
+                    onChange={(e) => setEditTitulo(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Descrição</label>
+                  <textarea
+                    value={editDescricao}
+                    onChange={(e) => setEditDescricao(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Preço (R$) <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editPreco}
+                    onChange={(e) => setEditPreco(e.target.value)}
+                    placeholder="29,90"
+                    className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  />
+                </div>
+
+                {editError && (
+                  <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-xl">{editError}</p>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setEditOpen(false)}
+                    className="flex-1 py-2.5 rounded-2xl border border-rose-100 text-sm text-gray-500 hover:bg-rose-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={loadingSave || !editTitulo.trim()}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-rose-400 hover:bg-rose-500 text-white text-sm font-bold transition-colors disabled:opacity-60"
+                  >
+                    <Save size={15} />
+                    {loadingSave ? 'Salvando...' : 'Salvar'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Aba Fotos */}
+            {tab === 'fotos' && (
+              <div className="space-y-4">
+                {localImagens.length === 0 ? (
+                  <p className="text-sm text-center text-gray-400 py-4">Nenhuma foto ainda.</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {localImagens.map((img, idx) => (
+                      <div key={img.id} className="relative group aspect-square rounded-xl overflow-hidden bg-rose-50">
+                        <Image src={img.url} alt={`Foto ${idx + 1}`} fill className="object-cover" sizes="120px" />
+                        {idx === 0 && (
+                          <span className="absolute top-1 left-1 bg-rose-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">Capa</span>
+                        )}
+                        <button
+                          onClick={() => handleRemoveImage(img)}
+                          disabled={removingId === img.id}
+                          className="absolute top-1 right-1 bg-black/60 hover:bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-60"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {localImagens.length < 6 && (
+                  <label className={`flex items-center justify-center gap-2 w-full border-2 border-dashed border-rose-200 rounded-xl py-3 text-sm text-rose-400 font-semibold cursor-pointer hover:bg-rose-50 transition-colors ${uploadingPhotos ? 'opacity-60 pointer-events-none' : ''}`}>
+                    <ImagePlus size={16} />
+                    {uploadingPhotos ? 'Enviando...' : `Adicionar fotos (${6 - localImagens.length} restante${6 - localImagens.length !== 1 ? 's' : ''})`}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleAddPhotos}
+                    />
+                  </label>
+                )}
+
+                {photoError && (
+                  <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-xl">{photoError}</p>
+                )}
+
+                <p className="text-xs text-gray-400 text-center">
+                  A primeira foto é a capa. Máximo 6 imagens.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
