@@ -2,8 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
-import { Pencil, Power, X, Save } from 'lucide-react'
+import { Pencil, Power, X, Save, ImagePlus, Trash2 } from 'lucide-react'
+import type { ProdutoImagem } from '@/types'
+
+const STORAGE_BUCKET = 'produtos-3d'
 
 interface Props {
   id: string
@@ -11,12 +15,14 @@ interface Props {
   descricao: string | null
   preco: number
   ativo: boolean
+  imagens: ProdutoImagem[]
 }
 
-export default function ProductActions({ id, titulo, descricao, preco, ativo }: Props) {
+export default function ProductActions({ id, titulo, descricao, preco, ativo, imagens }: Props) {
   const router = useRouter()
   const [loadingToggle, setLoadingToggle] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [tab, setTab] = useState<'dados' | 'fotos'>('dados')
 
   // Edit form state
   const [editTitulo, setEditTitulo] = useState(titulo)
@@ -24,6 +30,14 @@ export default function ProductActions({ id, titulo, descricao, preco, ativo }: 
   const [editPreco, setEditPreco] = useState(String(preco).replace('.', ','))
   const [loadingSave, setLoadingSave] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+
+  // Images state (local copy so UI updates instantly)
+  const [localImagens, setLocalImagens] = useState<ProdutoImagem[]>(
+    [...imagens].sort((a, b) => a.ordem - b.ordem)
+  )
+  const [removingId, setRemovingId] = useState<string | null>(null)
+  const [uploadingPhotos, setUploadingPhotos] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
 
   async function handleToggle() {
     setLoadingToggle(true)
@@ -54,6 +68,79 @@ export default function ProductActions({ id, titulo, descricao, preco, ativo }: 
     }
     setEditOpen(false)
     router.refresh()
+  }
+
+  async function handleRemoveImage(img: ProdutoImagem) {
+    setRemovingId(img.id)
+    const supabase = createClient()
+
+    // Extract storage path from URL (everything after /produtos-3d/)
+    const marker = `/${STORAGE_BUCKET}/`
+    const storagePath = img.url.includes(marker)
+      ? img.url.split(marker)[1].split('?')[0]
+      : null
+
+    await supabase.from('produto_imagens').delete().eq('id', img.id)
+    if (storagePath) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([storagePath])
+    }
+
+    // Reorder remaining
+    setLocalImagens((prev) => {
+      const remaining = prev.filter((i) => i.id !== img.id)
+        .map((i, idx) => ({ ...i, ordem: idx }))
+      return remaining
+    })
+    setRemovingId(null)
+    router.refresh()
+  }
+
+  async function handleAddPhotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files ?? [])
+    e.target.value = ''
+    if (selected.length === 0) return
+    const slots = 6 - localImagens.length
+    if (slots <= 0) {
+      setPhotoError('Limite de 6 fotos atingido.')
+      return
+    }
+    const toUpload = selected.slice(0, slots)
+    setUploadingPhotos(true)
+    setPhotoError(null)
+    const supabase = createClient()
+    const novasImagens: ProdutoImagem[] = []
+
+    try {
+      for (let i = 0; i < toUpload.length; i++) {
+        const file = toUpload[i]
+        const ext = file.name.split('.').pop()
+        const ordem = localImagens.length + i
+        const fileName = `${id}/${ordem}-${Date.now()}.${ext}`
+
+        const { error: uploadError } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .upload(fileName, file, { cacheControl: '3600', upsert: false })
+
+        if (uploadError) throw new Error(`Erro no upload: ${uploadError.message}`)
+
+        const { data: pub } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName)
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('produto_imagens')
+          .insert({ produto_id: id, url: pub.publicUrl, ordem })
+          .select()
+          .single()
+
+        if (insertError || !inserted) throw new Error('Erro ao registrar imagem.')
+        novasImagens.push(inserted as ProdutoImagem)
+      }
+      setLocalImagens((prev) => [...prev, ...novasImagens])
+      router.refresh()
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : 'Erro inesperado.')
+    } finally {
+      setUploadingPhotos(false)
+    }
   }
 
   return (
