@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+async function handler(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Verifica se existe algum cookie de sessão do Supabase
@@ -24,6 +24,9 @@ export async function proxy(request: NextRequest) {
 
   return NextResponse.next()
 }
+
+// Next.js 16 usa "proxy", versões anteriores usam "middleware"
+export { handler as proxy, handler as middleware }
 
 export const config = {
   matcher: ['/admin/:path*', '/login'],

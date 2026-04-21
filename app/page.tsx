@@ -15,11 +15,15 @@ function getWhatsAppLink(titulo: string, preco: number): string {
 export default async function Home() {
   const supabase = await createClient()
 
-  const { data: produtos } = await supabase
+  const { data: produtos, error } = await supabase
     .from('produtos')
     .select('*, produto_imagens(id, url, ordem)')
     .eq('ativo', true)
     .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Supabase error:', error.message)
+  }
 
   return (
     <main className="min-h-screen flex flex-col bg-rose-50/40">
