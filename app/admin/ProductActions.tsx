@@ -412,11 +412,6 @@ export default function ProductActions({
   )
 }
 
-
-  // Edit form state
-  const [editTitulo, setEditTitulo] = useState(titulo)
-  const [editDescricao, setEditDescricao] = useState(descricao ?? '')
-  const [editPreco, setEditPreco] = useState(String(preco).replace('.', ','))
   const [loadingSave, setLoadingSave] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
