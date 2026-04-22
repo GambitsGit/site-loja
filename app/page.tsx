@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { MessageCircle, Package, Sparkles } from 'lucide-react'
+import { MessageCircle, Package, ShoppingBag } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import type { Produto } from '@/types'
 import ProductCarousel from './components/ProductCarousel'
@@ -10,7 +10,7 @@ const WHATSAPP_NUMBER = '5541992533439'
 
 function getWhatsAppLink(titulo: string, preco: number): string {
   const precoFormatado = preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-  const mensagem = `Olá! Vi a peça *${titulo}* no site por R$ ${precoFormatado} e tenho interesse!`
+  const mensagem = `Olá! Vi a peça *${titulo}* no site por R$ ${precoFormatado} e tenho interesse em comprar!`
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensagem)}`
 }
 
@@ -28,60 +28,65 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-rose-50/40">
+    <div className="min-h-screen bg-white">
 
-      {/* ── Header ── */}
-      <header className="bg-white border-b border-rose-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      {/* ── Header estilo Instagram ── */}
+      <header className="sticky top-0 z-30 bg-white border-b border-gray-100">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <Image
             src="/logo.png"
             alt="Glow Maker 3D"
-            width={200}
-            height={80}
-            className="h-14 sm:h-18 w-auto object-contain"
+            width={130}
+            height={44}
+            className="h-9 w-auto object-contain"
             priority
           />
           <a
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 active:scale-95 text-white text-sm font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-full transition-all shadow-md shadow-green-200 whitespace-nowrap"
+            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-full transition-all"
           >
-            <MessageCircle size={16} />
-            <span>Fale Conosco</span>
+            <MessageCircle size={13} />
+            Contato
           </a>
         </div>
       </header>
 
-      {/* ── Hero ── */}
-      <section className="py-16 sm:py-24 px-4 text-center">
-        <div className="max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 bg-rose-100 text-rose-500 text-xs font-semibold px-3 py-1 rounded-full mb-5">
-            <Sparkles size={12} />
-            Feito com amor para você
+      {/* ── Bio / intro ── */}
+      <div className="max-w-lg mx-auto px-4 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-rose-50 flex-shrink-0 border-2 border-rose-200">
+            <Image
+              src="/logo.png"
+              alt="Glow Maker 3D"
+              width={64}
+              height={64}
+              className="w-full h-full object-contain p-1"
+            />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-5 text-gray-800">
-            Acessórios únicos em{' '}
-            <span className="text-rose-400">Impressão 3D</span>
-          </h1>
-          <p className="text-gray-400 text-lg leading-relaxed">
-            Organizadores de maquiagem, porta-batons, suportes e muito mais —
-            peças delicadas feitas sob encomenda só pra você.
-          </p>
+          <div>
+            <p className="font-bold text-gray-900 text-sm">glowmaker3d</p>
+            <p className="text-gray-500 text-xs leading-relaxed mt-0.5">
+              ✨ Acessórios de maquiagem em impressão 3D<br />
+              🎀 Feitos sob encomenda com amor<br />
+              💬 Peça pelo WhatsApp
+            </p>
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── Grade de Produtos ── */}
-      <section className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 pb-24">
+      {/* ── Feed de posts ── */}
+      <main className="max-w-lg mx-auto pb-20">
         {!produtos || produtos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-rose-200">
+          <div className="flex flex-col items-center justify-center py-24 text-gray-300">
             <Package size={56} strokeWidth={1} />
-            <p className="mt-4 text-base font-medium text-rose-300">
+            <p className="mt-4 text-sm font-medium text-gray-400">
               Em breve, peças lindas esperando por você 🌸
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
             {(produtos as Produto[]).map((produto) => {
               const imagens = (produto.produto_imagens ?? [])
                 .sort((a, b) => a.ordem - b.ordem)
@@ -92,59 +97,71 @@ export default async function Home() {
               }
 
               return (
-                <article
-                  key={produto.id}
-                  className="bg-white rounded-3xl border border-rose-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 flex flex-col overflow-hidden"
-                >
-                  {/* Carrossel de imagens */}
-                  <div className="relative h-60 bg-rose-50">
+                <article key={produto.id} className="border-b border-gray-100">
+
+                  {/* Cabeçalho do post */}
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-rose-50 flex-shrink-0 border border-rose-100">
+                      <Image src="/logo.png" alt="Glow Maker 3D" width={32} height={32} className="w-full h-full object-contain p-0.5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 leading-none">glowmaker3d</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Impressão 3D sob encomenda</p>
+                    </div>
+                  </div>
+
+                  {/* Imagem / Carrossel — quadrado como Instagram */}
+                  <div className="relative w-full aspect-square bg-gray-50">
                     <ProductCarousel imagens={imagens} titulo={produto.titulo} />
                   </div>
 
-                  {/* Conteúdo */}
-                  <div className="p-5 flex flex-col flex-1">
-                    <h2 className="font-bold text-gray-800 text-base leading-snug mb-1">
-                      {produto.titulo}
-                    </h2>
-                    {produto.descricao && (
-                      <p className="text-gray-400 text-sm leading-relaxed flex-1 line-clamp-3 mb-4">
-                        {produto.descricao}
-                      </p>
-                    )}
-
-                    <div className="mt-auto pt-2">
-                      <p className="text-2xl font-extrabold text-rose-500 mb-3">
+                  {/* Ações e info */}
+                  <div className="px-4 py-3 space-y-2">
+                    {/* Preço destaque */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-xl font-extrabold text-rose-500">
                         {produto.preco.toLocaleString('pt-BR', {
                           style: 'currency',
                           currency: 'BRL',
                         })}
                       </p>
-                      <a
-                        href={getWhatsAppLink(produto.titulo, produto.preco)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 w-full
-                                   bg-green-500 hover:bg-green-600 text-white
-                                   font-semibold py-3 rounded-2xl transition-colors"
-                      >
-                        <MessageCircle size={18} />
-                        Comprar pelo WhatsApp
-                      </a>
+                      <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                        sob encomenda
+                      </span>
                     </div>
+
+                    {/* Título e descrição */}
+                    <div>
+                      <span className="text-sm font-bold text-gray-900">{produto.titulo}</span>
+                      {produto.descricao && (
+                        <span className="text-sm text-gray-500"> {produto.descricao}</span>
+                      )}
+                    </div>
+
+                    {/* Botão WhatsApp */}
+                    <a
+                      href={getWhatsAppLink(produto.titulo, produto.preco)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] text-white font-bold py-2.5 rounded-xl transition-all text-sm mt-1"
+                    >
+                      <ShoppingBag size={16} />
+                      Quero esse! Comprar pelo WhatsApp
+                    </a>
                   </div>
+
                 </article>
               )
             })}
           </div>
         )}
-      </section>
+      </main>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-rose-100 bg-white py-8 text-center text-sm text-rose-300">
-        <p>
-          © {new Date().getFullYear()} Glow Maker 3D — Feito com 💕 para mulheres incríveis
-        </p>
+      <footer className="max-w-lg mx-auto px-4 py-6 text-center text-xs text-gray-300 border-t border-gray-100">
+        © {new Date().getFullYear()} Glow Maker 3D — Feito com 💕
       </footer>
-    </main>
+    </div>
   )
 }
+
