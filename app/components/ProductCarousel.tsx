@@ -1,16 +1,34 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Package } from 'lucide-react'
 
 interface Props {
   imagens: string[]
   titulo: string
+  overrideImage?: string
 }
 
-export default function ProductCarousel({ imagens, titulo }: Props) {
+export default function ProductCarousel({ imagens, titulo, overrideImage }: Props) {
   const [idx, setIdx] = useState(0)
+
+  // Reset carousel when a variation is selected/deselected
+  useEffect(() => { setIdx(0) }, [overrideImage])
+
+  if (overrideImage) {
+    return (
+      <div className="relative h-full w-full">
+        <Image
+          src={overrideImage}
+          alt={titulo}
+          fill
+          className="object-cover"
+          sizes="(max-width: 640px) 100vw, 512px"
+        />
+      </div>
+    )
+  }
 
   if (imagens.length === 0) {
     return (

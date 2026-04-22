@@ -6,6 +6,15 @@ export type ProdutoImagem = {
   created_at: string
 }
 
+export type ProdutoVariacao = {
+  id: string
+  produto_id: string
+  nome: string
+  imagem_url: string
+  ordem: number
+  created_at: string
+}
+
 export type Produto = {
   id: string
   titulo: string
@@ -15,4 +24,5 @@ export type Produto = {
   ativo: boolean
   created_at: string
   produto_imagens?: ProdutoImagem[]
+  produto_variacoes?: ProdutoVariacao[]
 }

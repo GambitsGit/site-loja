@@ -74,6 +74,32 @@ CREATE POLICY "produto_imagens_delete_authenticated"
   ON public.produto_imagens FOR DELETE TO authenticated USING (true);
 
 -- ============================================================
+-- 5. TABELA DE VARIAÇÕES / CORES (ex: Rosa, Branco, Lilás)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.produto_variacoes (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  produto_id  UUID        NOT NULL REFERENCES public.produtos(id) ON DELETE CASCADE,
+  nome        TEXT        NOT NULL,
+  imagem_url  TEXT        NOT NULL,
+  ordem       INTEGER     NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.produto_variacoes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "produto_variacoes_select_public"
+  ON public.produto_variacoes FOR SELECT TO public USING (true);
+
+CREATE POLICY "produto_variacoes_insert_authenticated"
+  ON public.produto_variacoes FOR INSERT TO authenticated WITH CHECK (true);
+
+CREATE POLICY "produto_variacoes_update_authenticated"
+  ON public.produto_variacoes FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "produto_variacoes_delete_authenticated"
+  ON public.produto_variacoes FOR DELETE TO authenticated USING (true);
+
+-- ============================================================
 -- INSTRUÇÕES PARA O SUPABASE STORAGE
 -- ============================================================
 -- Execute os passos abaixo no Dashboard do Supabase:

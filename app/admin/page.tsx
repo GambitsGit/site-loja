@@ -22,10 +22,10 @@ export default async function AdminPage() {
     redirect('/login')
   }
 
-  // Busca todos os produtos com imagens
+  // Busca todos os produtos com imagens e variações
   const { data: produtos } = await supabase
     .from('produtos')
-    .select('*, produto_imagens(id, url, ordem)')
+    .select('*, produto_imagens(id, url, ordem), produto_variacoes(id, produto_id, nome, imagem_url, ordem, created_at)')
     .order('created_at', { ascending: false })
 
   return (
@@ -140,6 +140,7 @@ export default async function AdminPage() {
                           preco={produto.preco}
                           ativo={produto.ativo}
                           imagens={produto.produto_imagens ?? []}
+                          variacoes={produto.produto_variacoes ?? []}
                         />
                       </div>
                     </li>
