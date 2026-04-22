@@ -185,7 +185,7 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {/* ── Moderação de Comentários ── */}}
+      {/* ── Moderação de Comentários ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12">
         <div className="bg-white rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-rose-100 flex items-center justify-between">
