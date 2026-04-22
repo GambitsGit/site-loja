@@ -57,6 +57,9 @@ function ProductPost({ produto, priority }: { produto: Produto; priority?: boole
   if (imagens.length === 0 && produto.imagem_url) imagens.push(produto.imagem_url)
 
   const variacoes = (produto.produto_variacoes ?? []).sort((a, b) => a.ordem - b.ordem)
+  const [expandedDesc, setExpandedDesc] = useState(false)
+  const CHAR_LIMIT = 120
+  const descLonga = (produto.descricao?.length ?? 0) > CHAR_LIMIT
 
   // Pré-aquece o cache do Vercel Image Optimization para as variações de cor
   // assim a troca de imagem é instantânea quando o usuário clica
@@ -150,7 +153,20 @@ function ProductPost({ produto, priority }: { produto: Produto; priority?: boole
             <span className="text-sm text-rose-400 font-medium"> — {selectedVar.nome}</span>
           )}
           {produto.descricao && (
-            <span className="text-sm text-gray-500"> {produto.descricao}</span>
+            <span className="text-sm text-gray-500">
+              {' '}
+              {descLonga && !expandedDesc
+                ? produto.descricao.slice(0, CHAR_LIMIT).trimEnd() + '…'
+                : produto.descricao}
+              {descLonga && (
+                <button
+                  onClick={() => setExpandedDesc((v) => !v)}
+                  className="ml-1 text-rose-400 font-semibold hover:text-rose-600 transition-colors"
+                >
+                  {expandedDesc ? ' ver menos' : ' ver mais'}
+                </button>
+              )}
+            </span>
           )}
         </div>
         <a
