@@ -37,6 +37,13 @@ export default async function AdminPage() {
     .eq('aprovado', false)
     .order('created_at', { ascending: true })
 
+  // Busca comentários já aprovados (para permitir exclusão)
+  const { data: comentariosAprovados } = await supabase
+    .from('comentarios')
+    .select('*, produtos(titulo)')
+    .eq('aprovado', true)
+    .order('created_at', { ascending: false })
+
   // Busca todos os stories
   const { data: stories } = await supabase
     .from('stories')
@@ -200,7 +207,7 @@ export default async function AdminPage() {
             )}
           </div>
           <div className="p-6">
-            <CommentsPanel pendentes={(comentariosPendentes ?? []) as any} />
+            <CommentsPanel pendentes={(comentariosPendentes ?? []) as any} aprovados={(comentariosAprovados ?? []) as any} />
           </div>
         </div>
       </div>
