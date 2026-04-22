@@ -156,6 +156,37 @@ CREATE POLICY "comentarios_delete_auth"
   ON public.comentarios FOR DELETE TO authenticated USING (true);
 
 -- ============================================================
+-- 8. TABELA DE STORIES (destaques fixados abaixo da bio)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.stories (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo      TEXT        NOT NULL,
+  subtitulo   TEXT,
+  tipo        TEXT        NOT NULL DEFAULT 'destaque' CHECK (tipo IN ('produto', 'depoimento', 'destaque')),
+  capa_url    TEXT        NOT NULL,
+  midia_url   TEXT,
+  midia_tipo  TEXT        NOT NULL DEFAULT 'imagem' CHECK (midia_tipo IN ('imagem', 'video')),
+  produto_id  UUID        REFERENCES public.produtos(id) ON DELETE SET NULL,
+  ordem       INTEGER     NOT NULL DEFAULT 0,
+  ativo       BOOLEAN     NOT NULL DEFAULT true,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.stories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "stories_select_public"
+  ON public.stories FOR SELECT TO public USING (true);
+
+CREATE POLICY "stories_insert_auth"
+  ON public.stories FOR INSERT TO authenticated WITH CHECK (true);
+
+CREATE POLICY "stories_update_auth"
+  ON public.stories FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "stories_delete_auth"
+  ON public.stories FOR DELETE TO authenticated USING (true);
+
+-- ============================================================
 -- INSTRUÇÕES PARA O SUPABASE STORAGE
 -- ============================================================
 -- Execute os passos abaixo no Dashboard do Supabase:

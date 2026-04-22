@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import { MessageCircle } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
-import type { Produto } from '@/types'
+import type { Produto, Story } from '@/types'
 import StoreView from './components/StoreView'
+import StoriesRow from './components/StoriesRow'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,11 +12,18 @@ const WHATSAPP_NUMBER = '5541992533439'
 export default async function Home() {
   const supabase = await createClient()
 
-  const { data: produtos, error } = await supabase
-    .from('produtos')
-    .select('*, produto_imagens(id, url, ordem), produto_variacoes(id, produto_id, nome, imagem_url, ordem, created_at)')
-    .eq('ativo', true)
-    .order('created_at', { ascending: false })
+  const [{ data: produtos, error }, { data: stories }] = await Promise.all([
+    supabase
+      .from('produtos')
+      .select('*, produto_imagens(id, url, ordem), produto_variacoes(id, produto_id, nome, imagem_url, ordem, created_at)')
+      .eq('ativo', true)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('stories')
+      .select('*')
+      .eq('ativo', true)
+      .order('ordem', { ascending: true }),
+  ])
 
   if (error) {
     console.error('Supabase error:', error.message)
@@ -69,6 +77,9 @@ export default async function Home() {
           Contato
         </a>
       </div>
+
+      {/* ── Stories fixados ── */}
+      <StoriesRow stories={(stories ?? []) as Story[]} />
 
       {/* ── StoreView: tabs feed/grade + produtos com variações ── */}
       <StoreView produtos={(produtos ?? []) as Produto[]} />

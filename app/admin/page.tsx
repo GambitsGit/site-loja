@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Package, MessageSquare } from 'lucide-react'
+import { Package, MessageSquare, Clapperboard } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
-import type { Produto } from '@/types'
+import type { Produto, Story } from '@/types'
 import ProductForm from './ProductForm'
 import LogoutButton from './LogoutButton'
 import ProductActions from './ProductActions'
 import CommentsPanel from './CommentsPanel'
+import StoriesManager from './StoriesManager'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,6 +36,12 @@ export default async function AdminPage() {
     .select('*, produtos(titulo)')
     .eq('aprovado', false)
     .order('created_at', { ascending: true })
+
+  // Busca todos os stories
+  const { data: stories } = await supabase
+    .from('stories')
+    .select('*')
+    .order('ordem', { ascending: true })
 
   return (
     <div className="min-h-screen bg-rose-50/40">
@@ -162,7 +169,23 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {/* ── Moderação de Comentários ── */}
+      {/* ── Stories ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+        <div className="bg-white rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-rose-100 flex items-center gap-2">
+            <Clapperboard size={18} className="text-rose-400" />
+            <h2 className="text-lg font-semibold text-gray-800">Stories</h2>
+            <span className="text-sm text-rose-400 bg-rose-50 px-2.5 py-0.5 rounded-full ml-auto">
+              {stories?.length ?? 0}
+            </span>
+          </div>
+          <div className="p-6">
+            <StoriesManager stories={(stories ?? []) as Story[]} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Moderação de Comentários ── */}}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12">
         <div className="bg-white rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-rose-100 flex items-center justify-between">

@@ -36,3 +36,17 @@ export type Comentario = {
   resposta_admin: string | null
   created_at: string
 }
+
+export type Story = {
+  id: string
+  titulo: string
+  subtitulo: string | null
+  tipo: 'produto' | 'depoimento' | 'destaque'
+  capa_url: string
+  midia_url: string | null
+  midia_tipo: 'imagem' | 'video'
+  produto_id: string | null
+  ordem: number
+  ativo: boolean
+  created_at: string
+}
