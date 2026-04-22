@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { LayoutGrid, List, Share2, ShoppingBag } from 'lucide-react'
 import type { Produto, ProdutoVariacao } from '@/types'
@@ -48,7 +48,7 @@ function ShareButton({ titulo, preco }: { titulo: string; preco: number }) {
   )
 }
 
-function ProductPost({ produto }: { produto: Produto }) {
+function ProductPost({ produto, priority }: { produto: Produto; priority?: boolean }) {
   const [selectedVar, setSelectedVar] = useState<ProdutoVariacao | null>(null)
 
   const imagens = (produto.produto_imagens ?? [])
@@ -57,6 +57,15 @@ function ProductPost({ produto }: { produto: Produto }) {
   if (imagens.length === 0 && produto.imagem_url) imagens.push(produto.imagem_url)
 
   const variacoes = (produto.produto_variacoes ?? []).sort((a, b) => a.ordem - b.ordem)
+
+  // Pré-aquece o cache do Vercel Image Optimization para as variações de cor
+  // assim a troca de imagem é instantânea quando o usuário clica
+  useEffect(() => {
+    variacoes.forEach((v) => {
+      const img = new window.Image()
+      img.src = `/_next/image?url=${encodeURIComponent(v.imagem_url)}&w=640&q=75`
+    })
+  }, [variacoes])
 
   return (
     <article className="border-b border-gray-100">
@@ -77,6 +86,7 @@ function ProductPost({ produto }: { produto: Produto }) {
           imagens={imagens}
           titulo={produto.titulo}
           overrideImage={selectedVar?.imagem_url}
+          priority={priority}
         />
       </div>
 
@@ -204,8 +214,8 @@ export default function StoreView({ produtos }: Props) {
           </div>
         ) : view === 'feed' ? (
           <div>
-            {produtos.map((p) => (
-              <ProductPost key={p.id} produto={p} />
+            {produtos.map((p, i) => (
+              <ProductPost key={p.id} produto={p} priority={i === 0} />
             ))}
           </div>
         ) : (

@@ -8,9 +8,10 @@ interface Props {
   imagens: string[]
   titulo: string
   overrideImage?: string
+  priority?: boolean
 }
 
-export default function ProductCarousel({ imagens, titulo, overrideImage }: Props) {
+export default function ProductCarousel({ imagens, titulo, overrideImage, priority }: Props) {
   const [idx, setIdx] = useState(0)
 
   // Reset carousel when a variation is selected/deselected
@@ -49,6 +50,7 @@ export default function ProductCarousel({ imagens, titulo, overrideImage }: Prop
         fill
         className="object-cover"
         sizes="(max-width: 640px) 100vw, 512px"
+        priority={priority && idx === 0}
       />
 
       {imagens.length > 1 && (
