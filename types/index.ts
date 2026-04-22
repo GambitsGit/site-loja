@@ -26,3 +26,13 @@ export type Produto = {
   produto_imagens?: ProdutoImagem[]
   produto_variacoes?: ProdutoVariacao[]
 }
+
+export type Comentario = {
+  id: string
+  produto_id: string
+  nome: string
+  texto: string
+  aprovado: boolean
+  resposta_admin: string | null
+  created_at: string
+}

@@ -100,6 +100,62 @@ CREATE POLICY "produto_variacoes_delete_authenticated"
   ON public.produto_variacoes FOR DELETE TO authenticated USING (true);
 
 -- ============================================================
+-- 6. TABELA DE LIKES (curtidas por produto)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.likes (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  produto_id  UUID        NOT NULL REFERENCES public.produtos(id) ON DELETE CASCADE,
+  visitor_id  TEXT        NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (produto_id, visitor_id)
+);
+
+ALTER TABLE public.likes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "likes_select_public"
+  ON public.likes FOR SELECT TO public USING (true);
+
+CREATE POLICY "likes_insert_public"
+  ON public.likes FOR INSERT TO public WITH CHECK (true);
+
+CREATE POLICY "likes_delete_public"
+  ON public.likes FOR DELETE TO public USING (true);
+
+-- ============================================================
+-- 7. TABELA DE COMENTÁRIOS / PERGUNTAS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.comentarios (
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  produto_id      UUID        NOT NULL REFERENCES public.produtos(id) ON DELETE CASCADE,
+  nome            TEXT        NOT NULL,
+  texto           TEXT        NOT NULL,
+  aprovado        BOOLEAN     NOT NULL DEFAULT false,
+  resposta_admin  TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.comentarios ENABLE ROW LEVEL SECURITY;
+
+-- Visitantes anônimos só veem comentários aprovados
+CREATE POLICY "comentarios_select_anon"
+  ON public.comentarios FOR SELECT TO anon USING (aprovado = true);
+
+-- Admin (autenticado) vê todos
+CREATE POLICY "comentarios_select_auth"
+  ON public.comentarios FOR SELECT TO authenticated USING (true);
+
+-- Qualquer visitante pode enviar comentário (aprovado deve ser false)
+CREATE POLICY "comentarios_insert_public"
+  ON public.comentarios FOR INSERT TO public WITH CHECK (aprovado = false);
+
+-- Admin pode aprovar, responder e excluir
+CREATE POLICY "comentarios_update_auth"
+  ON public.comentarios FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "comentarios_delete_auth"
+  ON public.comentarios FOR DELETE TO authenticated USING (true);
+
+-- ============================================================
 -- INSTRUÇÕES PARA O SUPABASE STORAGE
 -- ============================================================
 -- Execute os passos abaixo no Dashboard do Supabase:

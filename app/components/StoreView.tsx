@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { LayoutGrid, List, Share2, ShoppingBag } from 'lucide-react'
 import type { Produto, ProdutoVariacao } from '@/types'
 import ProductCarousel from './ProductCarousel'
+import LikeButton from './LikeButton'
+import CommentsSection from './CommentsSection'
 
 const WHATSAPP_NUMBER = '5541992533439'
 
@@ -79,8 +81,11 @@ function ProductPost({ produto }: { produto: Produto }) {
       </div>
 
       {/* Action bar */}
-      <div className="px-4 pt-3 flex items-center gap-4">
-        <ShareButton titulo={produto.titulo} preco={produto.preco} />
+      <div className="px-4 pt-3 flex items-center gap-3">
+        <LikeButton produtoId={produto.id} />
+        <div className="ml-auto">
+          <ShareButton titulo={produto.titulo} preco={produto.preco} />
+        </div>
       </div>
 
       {/* Variações de cor */}
@@ -150,6 +155,7 @@ function ProductPost({ produto }: { produto: Produto }) {
             : 'Quero esse! Comprar pelo WhatsApp'}
         </a>
       </div>
+      <CommentsSection produtoId={produto.id} titulo={produto.titulo} />
     </article>
   )
 }

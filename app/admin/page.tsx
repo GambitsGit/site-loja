@@ -1,12 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Package } from 'lucide-react'
+import { Package, MessageSquare } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import type { Produto } from '@/types'
 import ProductForm from './ProductForm'
 import LogoutButton from './LogoutButton'
 import ProductActions from './ProductActions'
+import CommentsPanel from './CommentsPanel'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,13 @@ export default async function AdminPage() {
     .from('produtos')
     .select('*, produto_imagens(id, url, ordem), produto_variacoes(id, produto_id, nome, imagem_url, ordem, created_at)')
     .order('created_at', { ascending: false })
+
+  // Busca comentários pendentes de moderação
+  const { data: comentariosPendentes } = await supabase
+    .from('comentarios')
+    .select('*, produtos(titulo)')
+    .eq('aprovado', false)
+    .order('created_at', { ascending: true })
 
   return (
     <div className="min-h-screen bg-rose-50/40">
@@ -151,6 +159,26 @@ export default async function AdminPage() {
             </div>
           </div>
 
+        </div>
+      </div>
+
+      {/* ── Moderação de Comentários ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12">
+        <div className="bg-white rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-rose-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={18} className="text-rose-400" />
+              <h2 className="text-lg font-semibold text-gray-800">Comentários Pendentes</h2>
+            </div>
+            {(comentariosPendentes?.length ?? 0) > 0 && (
+              <span className="text-sm bg-rose-500 text-white px-2.5 py-0.5 rounded-full font-bold">
+                {comentariosPendentes!.length}
+              </span>
+            )}
+          </div>
+          <div className="p-6">
+            <CommentsPanel pendentes={(comentariosPendentes ?? []) as any} />
+          </div>
         </div>
       </div>
     </div>
