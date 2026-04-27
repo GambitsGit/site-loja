@@ -64,11 +64,11 @@ export default function LikeButton({ produtoId }: { produtoId: string }) {
       <Heart
         size={24}
         className={`transition-all duration-200 ${animating ? 'scale-125' : 'scale-100'} ${
-          liked ? 'fill-rose-500 text-rose-500' : 'text-gray-800 hover:text-rose-400'
+          liked ? 'fill-rose-500 text-rose-500' : 'text-gray-800 dark:text-gray-200 hover:text-rose-400 dark:hover:text-rose-400'
         }`}
       />
       {count !== null && count > 0 && (
-        <span className="text-sm font-semibold text-gray-800 leading-none tabular-nums">{count}</span>
+        <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-none tabular-nums">{count}</span>
       )}
     </button>
   )

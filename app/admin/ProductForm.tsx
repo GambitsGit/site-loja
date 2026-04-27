@@ -13,6 +13,7 @@ export default function ProductForm() {
   const [titulo, setTitulo] = useState('')
   const [descricao, setDescricao] = useState('')
   const [preco, setPreco] = useState('')
+  const [objectFit, setObjectFit] = useState<'contain' | 'cover'>('contain')
   const [files, setFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
 
@@ -51,7 +52,12 @@ export default function ProductForm() {
       // 1. Inserir produto (sem imagem_url — usamos produto_imagens)
       const { data: produtoInserido, error: insertError } = await supabase
         .from('produtos')
-        .insert({ titulo, descricao: descricao.trim() || null, preco: precoNumerico })
+        .insert({
+          titulo,
+          descricao: descricao.trim() || null,
+          preco: precoNumerico,
+          object_fit: objectFit,
+        })
         .select('id')
         .single()
 
@@ -84,6 +90,7 @@ export default function ProductForm() {
       setTitulo('')
       setDescricao('')
       setPreco('')
+      setObjectFit('contain')
       previews.forEach((p) => URL.revokeObjectURL(p))
       setFiles([])
       setPreviews([])
@@ -149,6 +156,63 @@ export default function ProductForm() {
             className="w-full px-4 py-2.5 border border-rose-100 rounded-xl text-sm
                        focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent"
           />
+        </div>
+
+        {/* Ajuste de Imagem */}
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Como exibir a imagem?
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setObjectFit('contain')}
+              className={`relative p-4 border-2 rounded-xl transition-all ${
+                objectFit === 'contain'
+                  ? 'border-rose-400 bg-rose-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center">
+                <div className="w-2/3 h-2/3 bg-rose-400 rounded" />
+              </div>
+              <p className="text-xs font-semibold text-gray-700">Ajustar</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">
+                Mostra a imagem inteira sem cortar
+              </p>
+              {objectFit === 'contain' && (
+                <div className="absolute top-2 right-2 w-4 h-4 bg-rose-400 rounded-full flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setObjectFit('cover')}
+              className={`relative p-4 border-2 rounded-xl transition-all ${
+                objectFit === 'cover'
+                  ? 'border-rose-400 bg-rose-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="aspect-square bg-gray-100 rounded-lg mb-2 overflow-hidden">
+                <div className="w-full h-full bg-rose-400 scale-150" />
+              </div>
+              <p className="text-xs font-semibold text-gray-700">Preencher</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">
+                Preenche o espaço (pode cortar)
+              </p>
+              {objectFit === 'cover' && (
+                <div className="absolute top-2 right-2 w-4 h-4 bg-rose-400 rounded-full flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Upload de Fotos */}

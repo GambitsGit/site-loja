@@ -21,6 +21,7 @@ export type Produto = {
   descricao: string | null
   preco: number
   imagem_url: string | null
+  object_fit?: 'cover' | 'contain'
   ativo: boolean
   created_at: string
   produto_imagens?: ProdutoImagem[]

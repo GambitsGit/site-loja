@@ -83,7 +83,7 @@ export default function CommentsSection({
       {/* Toggle */}
       <button
         onClick={handleToggle}
-        className="px-4 text-sm text-gray-400 hover:text-gray-600 transition-colors block w-full text-left py-1"
+        className="px-4 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors block w-full text-left py-1"
       >
         {count > 0
           ? expanded
@@ -96,23 +96,23 @@ export default function CommentsSection({
         <div className="px-4 mt-2 space-y-3">
           {/* List */}
           {loading && (
-            <p className="text-xs text-gray-400 text-center py-2">Carregando…</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">Carregando…</p>
           )}
           {comments.map((c) => (
             <div key={c.id}>
-              <div className="bg-gray-50 rounded-2xl px-3 py-2.5">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl px-3 py-2.5">
                 <div className="flex justify-between items-baseline gap-2 mb-0.5">
-                  <span className="text-xs font-bold text-gray-900">{c.nome}</span>
-                  <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(c.created_at)}</span>
+                  <span className="text-xs font-bold text-gray-900 dark:text-gray-100">{c.nome}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0">{timeAgo(c.created_at)}</span>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">{c.texto}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{c.texto}</p>
               </div>
               {c.resposta_admin && (
-                <div className="ml-4 mt-1 bg-rose-50 border border-rose-100 rounded-2xl px-3 py-2">
-                  <span className="text-[10px] font-bold text-rose-500 block mb-0.5">
+                <div className="ml-4 mt-1 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900 rounded-2xl px-3 py-2">
+                  <span className="text-[10px] font-bold text-rose-500 dark:text-rose-400 block mb-0.5">
                     ✨ Glow Maker 3D
                   </span>
-                  <p className="text-sm text-gray-700 leading-relaxed">{c.resposta_admin}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{c.resposta_admin}</p>
                 </div>
               )}
             </div>
@@ -120,7 +120,7 @@ export default function CommentsSection({
 
           {/* Success message */}
           {sent && (
-            <div className="bg-green-50 border border-green-100 rounded-2xl px-3 py-2.5 text-sm text-green-700 text-center">
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-100 dark:border-green-900 rounded-2xl px-3 py-2.5 text-sm text-green-700 dark:text-green-400 text-center">
               ✅ Enviado! Seu comentário será publicado em breve.
             </div>
           )}
@@ -135,7 +135,7 @@ export default function CommentsSection({
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 maxLength={60}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 bg-white"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200 dark:focus:ring-rose-800 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
               <div className="flex gap-2">
                 <textarea
@@ -144,12 +144,12 @@ export default function CommentsSection({
                   onChange={(e) => setTexto(e.target.value)}
                   rows={2}
                   maxLength={500}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-200 bg-white"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-200 dark:focus:ring-rose-800 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 />
                 <button
                   type="submit"
                   disabled={submitting || !nome.trim() || !texto.trim()}
-                  className="self-end bg-rose-400 hover:bg-rose-500 disabled:opacity-40 text-white rounded-xl p-2.5 transition-colors"
+                  className="self-end bg-rose-400 hover:bg-rose-500 dark:bg-rose-500 dark:hover:bg-rose-600 disabled:opacity-40 text-white rounded-xl p-2.5 transition-colors"
                 >
                   <Send size={15} />
                 </button>
